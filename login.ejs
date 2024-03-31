@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>login page</title>
+    <style>
+        input {
+            margin-bottom: 16px;
+        }
+
+        label {
+            display: flex;
+            flex-direction: column;
+        }
+
+        input[type=button] {
+            display: flex;
+            flex-direction: row;
+            background-color: aquamarine;
+            border: 1px solid aquamarine;
+            border-radius: 30px;
+        }
+
+        fieldset {
+            margin: 0px auto;
+            background-color: azure;
+        }
+
+        button {
+            display: flex;
+            flex-direction: row;
+            background-color: aquamarine;
+            border: 1px solid aquamarine;
+            border-radius: 30px;
+        }
+
+        p {
+            display: flex;
+            flex-direction: row;
+        }
+    </style>
+</head>
+
+<body>
+    <form id="form1">
+
+        <fieldset style="width: 15%;">
+            <legend> Login</legend>
+            <label for="User">Email</label>
+            <input type="text" id="loginemail" name="loginemail">
+
+            <label for="password"> Password</label>
+            <input type="text" id="loginpassword" name="loginpassword">
+
+            <!-- 
+
+            <input type="button" id="pbutton" value="submit" onclick="setPassword()"> -->
+            <!-- <input type="button" id="lbutton" value="login" onclick="loginForm()"> -->
+            <input type="button" id="lbutton" value="login" onclick="loginForm()">
+            <!-- <input type="button" id="fbutton" value="Forgot Password" onclick="forgotpassword()"> -->
+            <p id="forgotpassword"><a href="http://localhost:3001/forgetpassword">forgot password</a> </p>
+            <p id="register"><a href="http://localhost:3001/register">click to register</a> </p>
+            <p id=message></p>
+
+
+            <span id="invalidcredentials"></span>
+
+
+    </form>
+</body>
+<script>
+
+    async function loginForm() {
+        if (!validateLogin()) {
+            return
+        };
+        console.log(validateLogin())
+        const form = document.getElementById('form1');
+        const formData = new FormData(form);
+        const serializedFormData = {};
+
+        for (const [key, value] of formData.entries()) {
+            const fieldName = key.replace('[]', '');
+            if (!serializedFormData[fieldName]) {
+                serializedFormData[fieldName] = [];
+            }
+            serializedFormData[fieldName].push(value);
+        }
+        // const code = await randomStr(6, 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890');
+
+
+
+        try {
+            const response = await fetch(`/login`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify(serializedFormData)
+            });
+
+            // if (!response.ok) {
+            //     document.getElementById("invalidcredentials").innerHTML = "invalid credentials";
+            // }
+            // const data = await response.json();
+            // debugger
+             
+            const tokenres = await response.json();
+            console.log("dssoidsi",tokenres.token);
+            const token=tokenres.token;
+            console.log(token);
+            // cookoie_auth=res.cookie()
+            // const token=await response.json();
+            if (token == false) {
+                document.getElementById("invalidcredentials").innerHTML = "<h3>invalid credentials</h3>"
+                return
+            }
+            // console.log("cookie",cookie_auth)
+           else if (tokenres)   {
+                console.log('truuuue');
+                document.getElementById("invalidcredentials").innerHTML = "<h3>Login Successful</h3>"
+                window.location.href="http://localhost:3001/dashboard";
+            }
+            console.log("token", token);
+
+
+
+
+        } catch (error) {
+            console.error('There was a problem with your fetch operation:', error);
+        }
+
+    }
+
+    function validateLogin() {
+        if (document.getElementById("loginemail").value == '' || document.getElementById("loginpassword").value == '') {
+            document.getElementById("message").innerHTML = "<h3>Please enter the login credentials <h3>"
+            return false;
+        }
+        else {
+            document.getElementById("message").innerHTML = " "
+            return true;
+        }
+
+
+
+    }
+
+
+
+
+
+
+</script>
+
+</html>
